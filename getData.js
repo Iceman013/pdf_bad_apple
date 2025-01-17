@@ -27,9 +27,30 @@ function showSong(data) {
 
 async function start() {
     let data = await getData();
-    // console.log(data.length);
-    // showSong(data);
-    console.log(data[0].length)
-    console.log(data[0][0].length)
+    let fs = require('fs');
+
+    let properData = "let data = [";
+    for (let i = 0; i < data.length; i++) {
+        if (i > 0) {
+            properData += ",";
+        }
+        let frame = "[";
+        for (let j = 0; j < data[i].length; j++) {
+            if (j > 0) {
+                frame += ",";
+            }
+            let row = "'";
+            for (let k = 0; k < data[i][j].length; k++) {
+                row += data[i][j][k].toString();
+            }
+            row += "'";
+            frame += row;
+        }
+        frame += "]";
+        properData += frame;
+    }
+    properData += "];";
+
+    fs.writeFileSync("demoData.js", properData);
 }
 start();

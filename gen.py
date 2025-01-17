@@ -265,7 +265,7 @@ PDF_FILE_TEMPLATE = ""
 
 jsfile = open("main.js", "r")
 jscontent = jsfile.read()
-datafile = open("data.js", "r")
+datafile = open("demoData.js", "r")
 datacontent = datafile.read()
 PDF_FILE_TEMPLATE = PDF_FILE_TEMP_A + datacontent + jscontent + PDF_FILE_TEMP_B
 

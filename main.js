@@ -85,7 +85,8 @@ function drawFrame() {
 	let array = data[frame];
 	for (let i = 0; i < array.length; i++) {
 		for (let j = 0; j < array[i].length; j++) {
-			draw_pixel(j, i, array[i][j] != 0);
+			let item = array[i].substring(j, j + 1);
+			draw_pixel(j, i, item != "0");
 		}
 	}
 }
