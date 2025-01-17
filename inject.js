@@ -1,0 +1,1 @@
+new Audio("https://simulationtouhou.weebly.com/uploads/1/6/5/2/16525562/bad_apple.mp3").play();

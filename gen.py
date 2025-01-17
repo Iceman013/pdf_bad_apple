@@ -1,3 +1,5 @@
+# PDF template
+
 PDF_FILE_TEMP_A = """
 %PDF-1.6
 
@@ -39,14 +41,14 @@ endobj
   /CropBox [
     0.0
     0.0
-    792.0
-    612.0
+    ###PAGE_WIDTH###
+    ###PAGE_HEIGHT###
   ]
   /MediaBox [
     0.0
     0.0
-    792.0
-    612.0
+    ###PAGE_WIDTH###
+    ###PAGE_HEIGHT###
   ]
   /Parent 2 0 R
   /Resources <<
@@ -106,6 +108,8 @@ trailer
 %%EOF
 """
 
+# End of template
+
 PLAYING_FIELD_OBJ = """
 ###IDX### obj
 <<
@@ -113,10 +117,10 @@ PLAYING_FIELD_OBJ = """
   /Ff 1
   /MK <<
     /BG [
-      0.8
+      1
     ]
     /BC [
-      0 0 0
+      0
     ]
   >>
   /Border [ 0 0 1 ]
@@ -141,10 +145,10 @@ PIXEL_OBJ = """
       ###COLOR###
     ]
     /BC [
-      0.5 0.5 0.5
+      0.0 0.0 0.0
     ]
   >>
-  /Border [ 0 0 1 ]
+  /Border [ 0 0 0 ]
   /P 16 0 R
   /Rect [
     ###RECT###
@@ -261,15 +265,22 @@ PDF_FILE_TEMPLATE = ""
 
 jsfile = open("main.js", "r")
 jscontent = jsfile.read()
-PDF_FILE_TEMPLATE = PDF_FILE_TEMP_A + jscontent + PDF_FILE_TEMP_B
+datafile = open("data.js", "r")
+datacontent = datafile.read()
+PDF_FILE_TEMPLATE = PDF_FILE_TEMP_A + datacontent + jscontent + PDF_FILE_TEMP_B
 
 # p1 = PIXEL_OBJ.replace("###IDX###", "50 0").replace("###COLOR###","1 0 0").replace("###RECT###", "460 700 480 720")
 
-PX_SIZE = 20
-GRID_WIDTH = 20
-GRID_HEIGHT = 20
-GRID_OFF_X = 200
-GRID_OFF_Y = 100
+PX_WIDTH = 18
+PX_HEIGHT = 18
+GRID_WIDTH = 36
+GRID_HEIGHT = 28
+
+PAGE_WIDTH = 792
+PAGE_HEIGHT = 612
+
+GRID_OFF_X = (PAGE_WIDTH - PX_WIDTH*GRID_WIDTH)/2
+GRID_OFF_Y = (PAGE_HEIGHT - PX_HEIGHT*GRID_HEIGHT)/2
 
 fields_text = ""
 field_indexes = []
@@ -285,7 +296,7 @@ def add_field(field):
 # Playing field outline
 playing_field = PLAYING_FIELD_OBJ
 playing_field = playing_field.replace("###IDX###", f"{obj_idx_ctr} 0")
-playing_field = playing_field.replace("###RECT###", f"{GRID_OFF_X} {GRID_OFF_Y} {GRID_OFF_X+GRID_WIDTH*PX_SIZE} {GRID_OFF_Y+GRID_HEIGHT*PX_SIZE}")
+playing_field = playing_field.replace("###RECT###", f"{GRID_OFF_X} {GRID_OFF_Y} {GRID_OFF_X+GRID_WIDTH*PX_WIDTH} {GRID_OFF_Y+GRID_HEIGHT*PX_HEIGHT}")
 add_field(playing_field)
 
 for x in range(GRID_WIDTH):
@@ -295,7 +306,7 @@ for x in range(GRID_WIDTH):
 		pixel = pixel.replace("###IDX###", f"{obj_idx_ctr} 0")
 		c = [0, 0, 0]
 		pixel = pixel.replace("###COLOR###", f"{c[0]} {c[1]} {c[2]}")
-		pixel = pixel.replace("###RECT###", f"{GRID_OFF_X+x*PX_SIZE} {GRID_OFF_Y+y*PX_SIZE} {GRID_OFF_X+x*PX_SIZE+PX_SIZE} {GRID_OFF_Y+y*PX_SIZE+PX_SIZE}")
+		pixel = pixel.replace("###RECT###", f"{GRID_OFF_X+x*PX_WIDTH} {GRID_OFF_Y+y*PX_HEIGHT} {GRID_OFF_X+x*PX_WIDTH+PX_WIDTH} {GRID_OFF_Y+y*PX_HEIGHT+PX_HEIGHT}")
 		pixel = pixel.replace("###X###", f"{x}")
 		pixel = pixel.replace("###Y###", f"{y}")
 
@@ -343,17 +354,18 @@ def add_text(label, name, x, y, width, height, js):
 # add_button("\\\\/", "B_down", GRID_OFF_X + 30, GRID_OFF_Y - 130, 50, 50, "lower_piece();")
 # add_button("SPIN", "B_rotate", GRID_OFF_X + 140, GRID_OFF_Y - 70, 50, 50, "rotate_piece();")
 
-add_button("Start game", "B_start", GRID_OFF_X + (GRID_WIDTH*PX_SIZE)/2-50, GRID_OFF_Y + (GRID_HEIGHT*PX_SIZE)/2-50, 100, 100, "game_init();")
-
+add_button("Start", "B_start", 0, 0, PAGE_WIDTH, PAGE_HEIGHT, "game_init();")
 
 # add_text("Type here for keyboard controls (WASD)", "T_input", GRID_OFF_X + 0, GRID_OFF_Y - 200, GRID_WIDTH*PX_SIZE, 50, "handle_input(event);")
 
-add_text("Score: 0", "T_score", GRID_OFF_X + GRID_WIDTH*PX_SIZE+10, GRID_OFF_Y + GRID_HEIGHT*PX_SIZE-50, 100, 50, "")
+# add_text("Score: 0", "T_score", GRID_OFF_X + GRID_WIDTH*PX_SIZE+10, GRID_OFF_Y + GRID_HEIGHT*PX_SIZE-50, 100, 50, "")
 
 filled_pdf = PDF_FILE_TEMPLATE.replace("###FIELDS###", fields_text)
 filled_pdf = filled_pdf.replace("###FIELD_LIST###", " ".join([f"{i} 0 R" for i in field_indexes]))
 filled_pdf = filled_pdf.replace("###GRID_WIDTH###", f"{GRID_WIDTH}")
 filled_pdf = filled_pdf.replace("###GRID_HEIGHT###", f"{GRID_HEIGHT}")
+filled_pdf = filled_pdf.replace("###PAGE_WIDTH###", f"{PAGE_WIDTH}")
+filled_pdf = filled_pdf.replace("###PAGE_HEIGHT###", f"{PAGE_HEIGHT}")
 
 pdffile = open("out.pdf","w")
 pdffile.write(filled_pdf)
