@@ -13,13 +13,14 @@ var TICK_INTERVAL = 50;
 var pixel_fields = [];
 var field = [];
 var score = 0;
-var time_ms = 0;
+var time_start = 0;
 var interval = 0;
 
 let frame = 0;
 let duration = data.length;
 
 function game_init() {
+	time_start = Date.now();
 	// and initialize game state
 	for (let x = 0; x < GRID_WIDTH; ++x) {
 		pixel_fields[x] = [];
@@ -90,11 +91,11 @@ function drawFrame() {
 }
 
 function game_tick() {
-	time_ms += TICK_INTERVAL;
+	let curTime = Date.now();
 
 	drawFrame();
 
-	frame++;
+	frame = Math.floor((curTime - time_start)/TICK_INTERVAL);
 	if (frame >= data.length) {
 		clearInterval(interval);
 	}
