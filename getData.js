@@ -51,6 +51,6 @@ async function start() {
     }
     properData += "];";
 
-    fs.writeFileSync("demoData.js", properData);
+    fs.writeFileSync("data.js", properData);
 }
 start();
